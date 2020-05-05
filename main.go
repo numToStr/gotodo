@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"numtostr/gofiber/auth"
 	"numtostr/gofiber/todo"
 
 	"github.com/gofiber/fiber"
@@ -38,6 +39,7 @@ func main() {
 	})
 
 	todo.Routes(app)
+	auth.Routes(app)
 
 	app.Listen(4000)
 }
