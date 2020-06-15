@@ -1,16 +1,12 @@
 package auth
 
-import (
-	"numtostr/gofiber/auth/service"
-
-	"github.com/gofiber/fiber"
-)
+import "github.com/gofiber/fiber"
 
 // Routes containes all the auth routes
 func Routes(app *fiber.App) {
 	r := app.Group("/auth")
 
-	r.Post("/signup", service.Signup)
+	r.Post("/signup", Signup)
 
-	r.Post("/login", service.Login)
+	r.Post("/login", Login)
 }
