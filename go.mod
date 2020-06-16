@@ -1,4 +1,4 @@
-module numtostr/gofiber
+module numtostr/gotodo
 
 go 1.14
 
