@@ -1,8 +1,9 @@
 package auth
 
 import (
+	"numtostr/gotodo/utils"
+
 	"github.com/gofiber/fiber"
-	"golang.org/x/crypto/bcrypt"
 )
 
 // Login service logs in a user
@@ -13,18 +14,17 @@ func Login(c *fiber.Ctx) {
 		panic(err)
 	}
 
-	hash, err := bcrypt.GenerateFromPassword([]byte(b.Password), 10)
-
-	if err != nil {
-		panic(err)
+	pwd := utils.Password{
+		String: b.Password,
 	}
 
 	c.JSON(&LoginRes{
-		Hash: string(hash),
+		Hash: pwd.Generate(),
 	})
 }
 
 // Signup service creates a user
 func Signup(c *fiber.Ctx) {
+
 	c.JSON(`Helo`)
 }

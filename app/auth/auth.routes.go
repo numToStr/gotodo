@@ -7,6 +7,5 @@ func Routes(app *fiber.App) {
 	r := app.Group("/auth")
 
 	r.Post("/signup", Signup)
-
 	r.Post("/login", Login)
 }
