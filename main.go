@@ -3,6 +3,7 @@ package main
 import (
 	"numtostr/gotodo/app/auth"
 	"numtostr/gotodo/app/todo"
+	"numtostr/gotodo/config"
 
 	"github.com/gofiber/fiber"
 	"github.com/gofiber/logger"
@@ -16,5 +17,5 @@ func main() {
 	todo.Routes(app)
 	auth.Routes(app)
 
-	app.Listen(4000)
+	app.Listen(config.PORT)
 }
