@@ -7,18 +7,22 @@ import (
 )
 
 // Login service logs in a user
-func Login(c *fiber.Ctx) {
+func Login(ctx *fiber.Ctx) {
 	b := new(LoginDTO)
 
-	if err := c.BodyParser(b); err != nil {
-		panic(err)
+	utils.ParseBody(ctx, b)
+
+	if err := utils.Validate(b); err != nil {
+		ctx.Next(err)
+
+		return
 	}
 
 	pwd := utils.Password{
 		String: b.Password,
 	}
 
-	c.JSON(&LoginRes{
+	ctx.JSON(&LoginRes{
 		Hash: pwd.Generate(),
 	})
 }
