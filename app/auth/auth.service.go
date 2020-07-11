@@ -6,6 +6,17 @@ import (
 	"github.com/gofiber/fiber"
 )
 
+// LoginDTO is the payload for login
+type LoginDTO struct {
+	Email    string `json:"email" validate:"required,email"`
+	Password string `json:"password" validate:"password"`
+}
+
+// LoginRes is the login response
+type LoginRes struct {
+	Hash string `json:"hash"`
+}
+
 // Login service logs in a user
 func Login(ctx *fiber.Ctx) {
 	b := new(LoginDTO)

@@ -2,6 +2,16 @@ package todo
 
 import "github.com/gofiber/fiber"
 
+// Todo defines the todo item
+type Todo struct {
+	Title string `json:"title"`
+}
+
+// Todos defines the todos list
+type Todos struct {
+	Todos []Todo `json:"todos"`
+}
+
 // GetTodos returns the todos list
 func GetTodos(c *fiber.Ctx) {
 	d := &Todos{
