@@ -4,6 +4,7 @@ import (
 	"numtostr/gotodo/app/auth"
 	"numtostr/gotodo/app/todo"
 	"numtostr/gotodo/config"
+	"numtostr/gotodo/config/database"
 	"numtostr/gotodo/utils"
 
 	"github.com/gofiber/fiber"
@@ -11,6 +12,8 @@ import (
 )
 
 func main() {
+	database.Connect()
+
 	app := fiber.New(&fiber.Settings{
 		ErrorHandler: utils.ErrorHandler,
 	})
