@@ -6,8 +6,8 @@ import "gorm.io/gorm"
 type User struct {
 	gorm.Model
 	Name     string
-	Email    string `gorm:"unique"`
-	Password string
+	Email    string `gorm:"unique;not null"`
+	Password string `gorm:"not null"`
 }
 
 // LoginDTO defined the /login payload
@@ -19,7 +19,7 @@ type LoginDTO struct {
 // SignupDTO defined the /login payload
 type SignupDTO struct {
 	LoginDTO
-	Name string `json:"name" validate:"required"`
+	Name string `json:"name" validate:"required,min=3"`
 }
 
 // UserRes todo
