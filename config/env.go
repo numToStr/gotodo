@@ -10,6 +10,8 @@ var (
 	PORT = getEnv("PORT", "5000")
 	// DB returns the name of the sqlite database
 	DB = getEnv("DB", "gotodo.db")
+	// TOKENKEY returns the jwt token secret
+	TOKENKEY = getEnv("TOKEN_KEY", "")
 )
 
 func getEnv(name string, fallback string) string {

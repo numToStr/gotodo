@@ -1,21 +1,15 @@
 package auth
 
 import (
+	"errors"
+	"numtostr/gotodo/config/database"
 	"numtostr/gotodo/utils"
+	"numtostr/gotodo/utils/jwt"
+	"numtostr/gotodo/utils/password"
 
 	"github.com/gofiber/fiber"
+	"gorm.io/gorm"
 )
-
-// LoginDTO is the payload for login
-type LoginDTO struct {
-	Email    string `json:"email" validate:"required,email"`
-	Password string `json:"password" validate:"password"`
-}
-
-// LoginRes is the login response
-type LoginRes struct {
-	Hash string `json:"hash"`
-}
 
 // Login service logs in a user
 func Login(ctx *fiber.Ctx) {
@@ -25,16 +19,32 @@ func Login(ctx *fiber.Ctx) {
 
 	if err := utils.Validate(b); err != nil {
 		ctx.Next(err)
-
 		return
 	}
 
-	pwd := utils.Password{
-		String: b.Password,
+	u := &UserRes{}
+
+	err := database.DB.Model(&User{}).Select("name", "email", "password", "id").Take(u, "email = ?", b.Email)
+
+	if errors.Is(err.Error, gorm.ErrRecordNotFound) {
+		ctx.Next(fiber.NewError(fiber.StatusUnauthorized, "Invalid email or password"))
+		return
 	}
 
-	ctx.JSON(&LoginRes{
-		Hash: pwd.Generate(),
+	if err := password.Verify(u.Password, b.Password); err != nil {
+		ctx.Next(fiber.NewError(fiber.StatusUnauthorized, "Invalid email or password"))
+		return
+	}
+
+	t := jwt.Generate(jwt.TokenPayload{
+		ID: b.Email,
+	})
+
+	ctx.JSON(&Response{
+		User: *u,
+		Auth: AccessRes{
+			Token: t,
+		},
 	})
 }
 

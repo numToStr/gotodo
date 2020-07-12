@@ -5,7 +5,8 @@ import (
 )
 
 type httpError struct {
-	Error string `json:"error"`
+	Statuscode int    `json:"statusCode"`
+	Error      string `json:"error"`
 }
 
 // ErrorHandler is used to catch error thrown inside the routes by ctx.Next(err)
@@ -19,6 +20,7 @@ func ErrorHandler(ctx *fiber.Ctx, err error) {
 	}
 
 	ctx.Status(code).JSON(&httpError{
-		Error: err.Error(),
+		Statuscode: code,
+		Error:      err.Error(),
 	})
 }

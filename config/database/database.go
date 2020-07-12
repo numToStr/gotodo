@@ -7,6 +7,7 @@ import (
 
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 // DB is the underlying database connection
@@ -16,6 +17,7 @@ var DB *gorm.DB
 func Connect() {
 	db, err := gorm.Open(sqlite.Open(config.DB), &gorm.Config{
 		NowFunc: func() time.Time { return time.Now().Local() },
+		Logger:  logger.Default.LogMode(logger.Info),
 	})
 
 	if err != nil {
@@ -27,4 +29,9 @@ func Connect() {
 	DB = db
 
 	fmt.Println("[DATABASE]::CONNECTED")
+}
+
+// Migrate migrates all the database tables
+func Migrate(tables ...interface{}) error {
+	return DB.AutoMigrate(tables...)
 }
