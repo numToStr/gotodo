@@ -34,8 +34,8 @@ func Login(ctx *fiber.Ctx) {
 		return
 	}
 
-	t := jwt.Generate(jwt.TokenPayload{
-		ID: b.Email,
+	t := jwt.Generate(&jwt.TokenPayload{
+		ID: u.ID,
 	})
 
 	ctx.JSON(&Response{
@@ -76,8 +76,8 @@ func Signup(ctx *fiber.Ctx) {
 	}
 
 	// generate access token
-	t := jwt.Generate(jwt.TokenPayload{
-		ID: user.Email,
+	t := jwt.Generate(&jwt.TokenPayload{
+		ID: user.ID,
 	})
 
 	ctx.JSON(&Response{

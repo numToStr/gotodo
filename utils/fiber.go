@@ -23,3 +23,9 @@ func ParseBodyAndValidate(ctx *fiber.Ctx, body interface{}) *fiber.Error {
 
 	return Validate(body)
 }
+
+// GetUser is helper function for getting authenticated user's id
+func GetUser(c *fiber.Ctx) *uint {
+	id, _ := c.Locals("USER").(uint)
+	return &id
+}
