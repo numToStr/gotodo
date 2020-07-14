@@ -6,6 +6,7 @@ import "github.com/gofiber/fiber"
 func Routes(app fiber.Router) {
 	r := app.Group("/todo")
 
+	r.Post("/create", CreateTodo)
 	r.Get("/list", GetTodos)
 	r.Get("/:todoID", GetTodo)
 	r.Delete("/:todoID", DeleteTodo)

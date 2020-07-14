@@ -13,7 +13,7 @@ import (
 
 func main() {
 	database.Connect()
-	database.Migrate(&auth.User{})
+	database.Migrate(&auth.User{}, &todo.Todo{})
 
 	app := fiber.New(&fiber.Settings{
 		ErrorHandler: utils.ErrorHandler,
