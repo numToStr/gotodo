@@ -22,9 +22,9 @@ func Login(ctx *fiber.Ctx) {
 
 	u := &UserRes{}
 
-	err := database.DB.Model(&User{}).Take(u, "email = ?", b.Email)
+	err := database.DB.Model(&User{}).Take(u, "email = ?", b.Email).Error
 
-	if errors.Is(err.Error, gorm.ErrRecordNotFound) {
+	if errors.Is(err, gorm.ErrRecordNotFound) {
 		ctx.Next(fiber.NewError(fiber.StatusUnauthorized, "Invalid email or password"))
 		return
 	}
@@ -39,8 +39,8 @@ func Login(ctx *fiber.Ctx) {
 	})
 
 	ctx.JSON(&Response{
-		User: *u,
-		Auth: AccessRes{
+		User: u,
+		Auth: &AccessRes{
 			Token: t,
 		},
 	})
@@ -55,10 +55,10 @@ func Signup(ctx *fiber.Ctx) {
 		return
 	}
 
-	err := database.DB.Model(&User{}).Take(&struct{ ID string }{}, "email = ?", b.Email)
+	err := database.DB.Model(&User{}).Take(&struct{ ID string }{}, "email = ?", b.Email).Error
 
 	// If email already exists, return
-	if !errors.Is(err.Error, gorm.ErrRecordNotFound) {
+	if !errors.Is(err, gorm.ErrRecordNotFound) {
 		ctx.Next(fiber.NewError(fiber.StatusConflict, "Email already exists"))
 		return
 	}
@@ -81,12 +81,12 @@ func Signup(ctx *fiber.Ctx) {
 	})
 
 	ctx.JSON(&Response{
-		User: UserRes{
-			ID:    int(user.ID),
+		User: &UserRes{
+			ID:    user.ID,
 			Name:  user.Name,
 			Email: user.Email,
 		},
-		Auth: AccessRes{
+		Auth: &AccessRes{
 			Token: t,
 		},
 	})

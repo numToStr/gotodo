@@ -1,12 +1,15 @@
 package todo
 
-import "gorm.io/gorm"
+import (
+	"gorm.io/gorm"
+)
 
 // Todo struct defines the Todo Model
 type Todo struct {
 	gorm.Model
 	Task      string `gorm:"not null"`
 	Completed bool   `gorm:"default:false"`
+	User      *uint  `gorm:"not null"`
 }
 
 // Response struct contains the todo field which should be returned in a response

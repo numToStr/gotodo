@@ -1,13 +1,18 @@
 package auth
 
-import "gorm.io/gorm"
+import (
+	"numtostr/gotodo/app/todo"
+
+	"gorm.io/gorm"
+)
 
 // User struct defines the user
 type User struct {
 	gorm.Model
 	Name     string
-	Email    string `gorm:"unique;not null"`
-	Password string `gorm:"not null"`
+	Email    string      `gorm:"uniqueIndex;not null"`
+	Password string      `gorm:"not null"`
+	Todos    []todo.Todo `gorm:"foreignKey:User"`
 }
 
 // LoginDTO defined the /login payload
@@ -24,7 +29,7 @@ type SignupDTO struct {
 
 // UserRes todo
 type UserRes struct {
-	ID       int    `json:"id"`
+	ID       uint   `json:"id"`
 	Name     string `json:"name"`
 	Email    string `json:"email"`
 	Password string `json:"-"`
@@ -37,6 +42,6 @@ type AccessRes struct {
 
 // Response todo
 type Response struct {
-	User UserRes   `json:"user"`
-	Auth AccessRes `json:"auth"`
+	User *UserRes   `json:"user"`
+	Auth *AccessRes `json:"auth"`
 }
