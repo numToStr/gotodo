@@ -61,12 +61,12 @@ func Verify(token string) (*TokenPayload, error) {
 	}
 
 	// Getting ID, it's an interface{} so I need to cast it to uint
-	id, ok := claims["ID"].(uint)
+	id, ok := claims["ID"].(float64)
 	if !ok {
 		return nil, errors.New("Something went wrong")
 	}
 
 	return &TokenPayload{
-		ID: id,
+		ID: uint(id),
 	}, nil
 }

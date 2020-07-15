@@ -9,7 +9,7 @@ import (
 
 // Auth is the authentication middleware
 func Auth(c *fiber.Ctx) {
-	h := (c.Get("Authorization"))
+	h := c.Get("Authorization")
 
 	if h == "" {
 		c.Next(fiber.ErrUnauthorized)
