@@ -1,25 +1,27 @@
 package utils
 
 import (
-	"log"
-
 	"github.com/gofiber/fiber"
 )
 
 // ParseBody is helper function for parsing the body.
 // Is any error occurs it will panic.
 // Its just a helper function to avoid writing if condition again n again.
-func ParseBody(ctx *fiber.Ctx, body interface{}) {
+func ParseBody(ctx *fiber.Ctx, body interface{}) *fiber.Error {
 	if err := ctx.BodyParser(body); err != nil {
-		log.Fatal(err)
+		return fiber.ErrBadRequest
 	}
+
+	return nil
 }
 
 // ParseBodyAndValidate is helper function for parsing the body.
 // Is any error occurs it will panic.
 // Its just a helper function to avoid writing if condition again n again.
 func ParseBodyAndValidate(ctx *fiber.Ctx, body interface{}) *fiber.Error {
-	ParseBody(ctx, body)
+	if err := ParseBody(ctx, body); err != nil {
+		return err
+	}
 
 	return Validate(body)
 }
