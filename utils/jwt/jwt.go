@@ -16,8 +16,14 @@ type TokenPayload struct {
 
 // Generate generates the jwt token based on payload
 func Generate(payload *TokenPayload) string {
+	v, err := time.ParseDuration(config.TOKENEXP)
+
+	if err != nil {
+		panic("Invalid time duration. Should be time.ParseDuration string")
+	}
+
 	t := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"exp": time.Now().Add(time.Hour * time.Duration(1)).Unix(),
+		"exp": time.Now().Add(v).Unix(),
 		"ID":  payload.ID,
 	})
 
