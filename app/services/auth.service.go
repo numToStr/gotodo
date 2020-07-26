@@ -1,8 +1,9 @@
-package auth
+package services
 
 import (
 	"errors"
 	"numtostr/gotodo/app/dal"
+	"numtostr/gotodo/app/types"
 	"numtostr/gotodo/utils"
 	"numtostr/gotodo/utils/jwt"
 	"numtostr/gotodo/utils/password"
@@ -13,14 +14,14 @@ import (
 
 // Login service logs in a user
 func Login(ctx *fiber.Ctx) {
-	b := new(LoginDTO)
+	b := new(types.LoginDTO)
 
 	if err := utils.ParseBodyAndValidate(ctx, b); err != nil {
 		ctx.Next(err)
 		return
 	}
 
-	u := &UserRes{}
+	u := &types.UserResponse{}
 
 	err := dal.FindUserByEmail(u, b.Email).Error
 
@@ -38,9 +39,9 @@ func Login(ctx *fiber.Ctx) {
 		ID: u.ID,
 	})
 
-	ctx.JSON(&Response{
+	ctx.JSON(&types.AuthResponse{
 		User: u,
-		Auth: &AccessRes{
+		Auth: &types.AccessResponse{
 			Token: t,
 		},
 	})
@@ -48,7 +49,7 @@ func Login(ctx *fiber.Ctx) {
 
 // Signup service creates a user
 func Signup(ctx *fiber.Ctx) {
-	b := new(SignupDTO)
+	b := new(types.SignupDTO)
 
 	if err := utils.ParseBodyAndValidate(ctx, b); err != nil {
 		ctx.Next(err)
@@ -80,13 +81,13 @@ func Signup(ctx *fiber.Ctx) {
 		ID: user.ID,
 	})
 
-	ctx.JSON(&Response{
-		User: &UserRes{
+	ctx.JSON(&types.AuthResponse{
+		User: &types.UserResponse{
 			ID:    user.ID,
 			Name:  user.Name,
 			Email: user.Email,
 		},
-		Auth: &AccessRes{
+		Auth: &types.AccessResponse{
 			Token: t,
 		},
 	})

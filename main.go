@@ -1,8 +1,8 @@
 package main
 
 import (
-	"numtostr/gotodo/app/auth"
 	"numtostr/gotodo/app/dal"
+	"numtostr/gotodo/app/routes"
 	"numtostr/gotodo/app/todo"
 	"numtostr/gotodo/config"
 	"numtostr/gotodo/config/database"
@@ -22,8 +22,8 @@ func main() {
 
 	app.Use(logger.New())
 
+	routes.AuthRoutes(app)
 	todo.Routes(app)
-	auth.Routes(app)
 
 	app.Listen(config.PORT)
 }

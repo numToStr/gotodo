@@ -1,4 +1,4 @@
-package auth
+package types
 
 // LoginDTO defined the /login payload
 type LoginDTO struct {
@@ -12,21 +12,21 @@ type SignupDTO struct {
 	Name string `json:"name" validate:"required,min=3"`
 }
 
-// UserRes todo
-type UserRes struct {
+// UserResponse todo
+type UserResponse struct {
 	ID       uint   `json:"id"`
 	Name     string `json:"name"`
 	Email    string `json:"email"`
 	Password string `json:"-"`
 }
 
-// AccessRes todo
-type AccessRes struct {
+// AccessResponse todo
+type AccessResponse struct {
 	Token string `json:"token"`
 }
 
-// Response todo
-type Response struct {
-	User *UserRes   `json:"user"`
-	Auth *AccessRes `json:"auth"`
+// AuthResponse todo
+type AuthResponse struct {
+	User *UserResponse   `json:"user"`
+	Auth *AccessResponse `json:"auth"`
 }
