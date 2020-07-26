@@ -2,7 +2,7 @@ package todo
 
 import (
 	"errors"
-	"numtostr/gotodo/config/database"
+	"numtostr/gotodo/app/dal"
 	"numtostr/gotodo/utils"
 
 	"github.com/gofiber/fiber"
@@ -18,12 +18,12 @@ func CreateTodo(c *fiber.Ctx) {
 		return
 	}
 
-	d := &Todo{
+	d := &dal.Todo{
 		Task: b.Task,
 		User: utils.GetUser(c),
 	}
 
-	if err := database.DB.Create(d).Error; err != nil {
+	if err := dal.CreateTodo(d).Error; err != nil {
 		c.Next(fiber.NewError(fiber.StatusConflict, err.Error()))
 		return
 	}
@@ -41,7 +41,7 @@ func CreateTodo(c *fiber.Ctx) {
 func GetTodos(c *fiber.Ctx) {
 	d := &[]Response{}
 
-	err := database.DB.Model(&Todo{}).Find(d, "user = ?", utils.GetUser(c)).Error
+	err := dal.FindTodosByUser(d, utils.GetUser(c)).Error
 	if err != nil {
 		c.Next(fiber.NewError(fiber.StatusConflict, err.Error()))
 		return
@@ -63,7 +63,7 @@ func GetTodo(c *fiber.Ctx) {
 
 	d := &Response{}
 
-	err := database.DB.Model(&Todo{}).Take(d, "id = ? AND user = ?", todoID, utils.GetUser(c)).Error
+	err := dal.FindTodoByUser(d, todoID, utils.GetUser(c)).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		c.JSON(&CreateRes{})
 		return
@@ -83,7 +83,7 @@ func DeleteTodo(c *fiber.Ctx) {
 		return
 	}
 
-	res := database.DB.Unscoped().Delete(&Todo{}, "id = ? AND user = ?", todoID, utils.GetUser(c))
+	res := dal.DeleteTodo(todoID, utils.GetUser(c))
 	if res.RowsAffected == 0 {
 		c.Next(fiber.NewError(fiber.StatusConflict, "Unable to delete todo"))
 		return
