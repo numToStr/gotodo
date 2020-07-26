@@ -1,8 +1,9 @@
-package todo
+package services
 
 import (
 	"errors"
 	"numtostr/gotodo/app/dal"
+	"numtostr/gotodo/app/types"
 	"numtostr/gotodo/utils"
 
 	"github.com/gofiber/fiber"
@@ -11,7 +12,7 @@ import (
 
 // CreateTodo is responsible for create todo
 func CreateTodo(c *fiber.Ctx) {
-	b := new(CreateDTO)
+	b := new(types.CreateDTO)
 
 	if err := utils.ParseBodyAndValidate(c, b); err != nil {
 		c.Next(err)
@@ -28,8 +29,8 @@ func CreateTodo(c *fiber.Ctx) {
 		return
 	}
 
-	c.JSON(&CreateRes{
-		Todo: &Response{
+	c.JSON(&types.TodoCreateResponse{
+		Todo: &types.TodoResponse{
 			ID:        d.ID,
 			Task:      d.Task,
 			Completed: d.Completed,
@@ -39,7 +40,7 @@ func CreateTodo(c *fiber.Ctx) {
 
 // GetTodos returns the todos list
 func GetTodos(c *fiber.Ctx) {
-	d := &[]Response{}
+	d := &[]types.TodoResponse{}
 
 	err := dal.FindTodosByUser(d, utils.GetUser(c)).Error
 	if err != nil {
@@ -47,7 +48,7 @@ func GetTodos(c *fiber.Ctx) {
 		return
 	}
 
-	c.JSON(&ListRes{
+	c.JSON(&types.TodosResponse{
 		Todos: d,
 	})
 }
@@ -61,15 +62,15 @@ func GetTodo(c *fiber.Ctx) {
 		return
 	}
 
-	d := &Response{}
+	d := &types.TodoResponse{}
 
 	err := dal.FindTodoByUser(d, todoID, utils.GetUser(c)).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
-		c.JSON(&CreateRes{})
+		c.JSON(&types.TodoCreateResponse{})
 		return
 	}
 
-	c.JSON(&CreateRes{
+	c.JSON(&types.TodoCreateResponse{
 		Todo: d,
 	})
 }
@@ -95,5 +96,5 @@ func DeleteTodo(c *fiber.Ctx) {
 		return
 	}
 
-	c.JSON(&CreateRes{})
+	c.JSON(&types.TodoCreateResponse{})
 }
