@@ -2,7 +2,7 @@ package auth
 
 import (
 	"errors"
-	"numtostr/gotodo/config/database"
+	"numtostr/gotodo/app/dal"
 	"numtostr/gotodo/utils"
 	"numtostr/gotodo/utils/jwt"
 	"numtostr/gotodo/utils/password"
@@ -22,7 +22,7 @@ func Login(ctx *fiber.Ctx) {
 
 	u := &UserRes{}
 
-	err := database.DB.Model(&User{}).Take(u, "email = ?", b.Email).Error
+	err := dal.FindUserByEmail(u, b.Email).Error
 
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		ctx.Next(fiber.NewError(fiber.StatusUnauthorized, "Invalid email or password"))
@@ -55,7 +55,7 @@ func Signup(ctx *fiber.Ctx) {
 		return
 	}
 
-	err := database.DB.Model(&User{}).Take(&struct{ ID string }{}, "email = ?", b.Email).Error
+	err := dal.FindUserByEmail(&struct{ ID string }{}, b.Email).Error
 
 	// If email already exists, return
 	if !errors.Is(err, gorm.ErrRecordNotFound) {
@@ -63,14 +63,14 @@ func Signup(ctx *fiber.Ctx) {
 		return
 	}
 
-	user := &User{
+	user := &dal.User{
 		Name:     b.Name,
 		Password: password.Generate(b.Password),
 		Email:    b.Email,
 	}
 
 	// Create a user, if error return
-	if err := database.DB.Create(user); err.Error != nil {
+	if err := dal.CreateUser(user); err.Error != nil {
 		ctx.Next(fiber.NewError(fiber.StatusConflict, err.Error.Error()))
 		return
 	}
