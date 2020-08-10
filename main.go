@@ -1,8 +1,8 @@
 package main
 
 import (
-	"numtostr/gotodo/app/auth"
-	"numtostr/gotodo/app/todo"
+	"numtostr/gotodo/app/dal"
+	"numtostr/gotodo/app/routes"
 	"numtostr/gotodo/config"
 	"numtostr/gotodo/config/database"
 	"numtostr/gotodo/utils"
@@ -13,7 +13,7 @@ import (
 
 func main() {
 	database.Connect()
-	database.Migrate(&auth.User{}, &todo.Todo{})
+	database.Migrate(&dal.User{}, &dal.Todo{})
 
 	app := fiber.New(&fiber.Settings{
 		ErrorHandler: utils.ErrorHandler,
@@ -21,8 +21,8 @@ func main() {
 
 	app.Use(logger.New())
 
-	todo.Routes(app)
-	auth.Routes(app)
+	routes.AuthRoutes(app)
+	routes.TodoRoutes(app)
 
 	app.Listen(config.PORT)
 }

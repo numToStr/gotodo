@@ -1,8 +1,9 @@
-package auth
+package services
 
 import (
 	"errors"
-	"numtostr/gotodo/config/database"
+	"numtostr/gotodo/app/dal"
+	"numtostr/gotodo/app/types"
 	"numtostr/gotodo/utils"
 	"numtostr/gotodo/utils/jwt"
 	"numtostr/gotodo/utils/password"
@@ -13,16 +14,16 @@ import (
 
 // Login service logs in a user
 func Login(ctx *fiber.Ctx) {
-	b := new(LoginDTO)
+	b := new(types.LoginDTO)
 
 	if err := utils.ParseBodyAndValidate(ctx, b); err != nil {
 		ctx.Next(err)
 		return
 	}
 
-	u := &UserRes{}
+	u := &types.UserResponse{}
 
-	err := database.DB.Model(&User{}).Take(u, "email = ?", b.Email).Error
+	err := dal.FindUserByEmail(u, b.Email).Error
 
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		ctx.Next(fiber.NewError(fiber.StatusUnauthorized, "Invalid email or password"))
@@ -38,9 +39,9 @@ func Login(ctx *fiber.Ctx) {
 		ID: u.ID,
 	})
 
-	ctx.JSON(&Response{
+	ctx.JSON(&types.AuthResponse{
 		User: u,
-		Auth: &AccessRes{
+		Auth: &types.AccessResponse{
 			Token: t,
 		},
 	})
@@ -48,14 +49,14 @@ func Login(ctx *fiber.Ctx) {
 
 // Signup service creates a user
 func Signup(ctx *fiber.Ctx) {
-	b := new(SignupDTO)
+	b := new(types.SignupDTO)
 
 	if err := utils.ParseBodyAndValidate(ctx, b); err != nil {
 		ctx.Next(err)
 		return
 	}
 
-	err := database.DB.Model(&User{}).Take(&struct{ ID string }{}, "email = ?", b.Email).Error
+	err := dal.FindUserByEmail(&struct{ ID string }{}, b.Email).Error
 
 	// If email already exists, return
 	if !errors.Is(err, gorm.ErrRecordNotFound) {
@@ -63,14 +64,14 @@ func Signup(ctx *fiber.Ctx) {
 		return
 	}
 
-	user := &User{
+	user := &dal.User{
 		Name:     b.Name,
 		Password: password.Generate(b.Password),
 		Email:    b.Email,
 	}
 
 	// Create a user, if error return
-	if err := database.DB.Create(user); err.Error != nil {
+	if err := dal.CreateUser(user); err.Error != nil {
 		ctx.Next(fiber.NewError(fiber.StatusConflict, err.Error.Error()))
 		return
 	}
@@ -80,13 +81,13 @@ func Signup(ctx *fiber.Ctx) {
 		ID: user.ID,
 	})
 
-	ctx.JSON(&Response{
-		User: &UserRes{
+	ctx.JSON(&types.AuthResponse{
+		User: &types.UserResponse{
 			ID:    user.ID,
 			Name:  user.Name,
 			Email: user.Email,
 		},
-		Auth: &AccessRes{
+		Auth: &types.AccessResponse{
 			Token: t,
 		},
 	})
