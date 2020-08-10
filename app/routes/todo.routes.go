@@ -14,5 +14,7 @@ func TodoRoutes(app fiber.Router) {
 	r.Post("/create", services.CreateTodo)
 	r.Get("/list", services.GetTodos)
 	r.Get("/:todoID", services.GetTodo)
+	r.Patch("/:todoID", services.UpdateTodoTitle)
+	r.Patch("/:todoID/check", services.CheckTodo)
 	r.Delete("/:todoID", services.DeleteTodo)
 }

@@ -96,5 +96,59 @@ func DeleteTodo(c *fiber.Ctx) {
 		return
 	}
 
-	c.JSON(&types.TodoCreateResponse{})
+	c.JSON(&types.MsgResponse{
+		Message: "Todo successfully deleted",
+	})
+}
+
+// CheckTodo TODO
+func CheckTodo(c *fiber.Ctx) {
+	b := new(types.CheckTodoDTO)
+	todoID := c.Params("todoID")
+
+	if todoID == "" {
+		c.Next(fiber.NewError(fiber.StatusUnprocessableEntity, "Invalid todoID"))
+		return
+	}
+
+	if err := utils.ParseBodyAndValidate(c, b); err != nil {
+		c.Next(err)
+		return
+	}
+
+	err := dal.UpdateTodo(todoID, utils.GetUser(c), map[string]interface{}{"completed": b.Completed}).Error
+	if err != nil {
+		c.Next(fiber.NewError(fiber.StatusConflict, err.Error()))
+		return
+	}
+
+	c.JSON(&types.MsgResponse{
+		Message: "Todo successfully updated",
+	})
+}
+
+// UpdateTodoTitle TODO
+func UpdateTodoTitle(c *fiber.Ctx) {
+	b := new(types.CreateDTO)
+	todoID := c.Params("todoID")
+
+	if todoID == "" {
+		c.Next(fiber.NewError(fiber.StatusUnprocessableEntity, "Invalid todoID"))
+		return
+	}
+
+	if err := utils.ParseBodyAndValidate(c, b); err != nil {
+		c.Next(err)
+		return
+	}
+
+	err := dal.UpdateTodo(todoID, utils.GetUser(c), &dal.Todo{Task: b.Task}).Error
+	if err != nil {
+		c.Next(fiber.NewError(fiber.StatusConflict, err.Error()))
+		return
+	}
+
+	c.JSON(&types.MsgResponse{
+		Message: "Todo successfully updated",
+	})
 }

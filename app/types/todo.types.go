@@ -21,3 +21,8 @@ type TodoCreateResponse struct {
 type TodosResponse struct {
 	Todos *[]TodoResponse `json:"todos"`
 }
+
+// CheckTodoDTO defined the payload for the check todo
+type CheckTodoDTO struct {
+	Completed bool `json:"completed"`
+}
