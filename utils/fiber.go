@@ -1,7 +1,7 @@
 package utils
 
 import (
-	"github.com/gofiber/fiber"
+	"github.com/gofiber/fiber/v2"
 )
 
 // ParseBody is helper function for parsing the body.

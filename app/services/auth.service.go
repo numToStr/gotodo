@@ -8,17 +8,16 @@ import (
 	"numtostr/gotodo/utils/jwt"
 	"numtostr/gotodo/utils/password"
 
-	"github.com/gofiber/fiber"
+	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 )
 
 // Login service logs in a user
-func Login(ctx *fiber.Ctx) {
+func Login(ctx *fiber.Ctx) error {
 	b := new(types.LoginDTO)
 
 	if err := utils.ParseBodyAndValidate(ctx, b); err != nil {
-		ctx.Next(err)
-		return
+		return err
 	}
 
 	u := &types.UserResponse{}
@@ -26,20 +25,18 @@ func Login(ctx *fiber.Ctx) {
 	err := dal.FindUserByEmail(u, b.Email).Error
 
 	if errors.Is(err, gorm.ErrRecordNotFound) {
-		ctx.Next(fiber.NewError(fiber.StatusUnauthorized, "Invalid email or password"))
-		return
+		return fiber.NewError(fiber.StatusUnauthorized, "Invalid email or password")
 	}
 
 	if err := password.Verify(u.Password, b.Password); err != nil {
-		ctx.Next(fiber.NewError(fiber.StatusUnauthorized, "Invalid email or password"))
-		return
+		return fiber.NewError(fiber.StatusUnauthorized, "Invalid email or password")
 	}
 
 	t := jwt.Generate(&jwt.TokenPayload{
 		ID: u.ID,
 	})
 
-	ctx.JSON(&types.AuthResponse{
+	return ctx.JSON(&types.AuthResponse{
 		User: u,
 		Auth: &types.AccessResponse{
 			Token: t,
@@ -48,20 +45,18 @@ func Login(ctx *fiber.Ctx) {
 }
 
 // Signup service creates a user
-func Signup(ctx *fiber.Ctx) {
+func Signup(ctx *fiber.Ctx) error {
 	b := new(types.SignupDTO)
 
 	if err := utils.ParseBodyAndValidate(ctx, b); err != nil {
-		ctx.Next(err)
-		return
+		return err
 	}
 
 	err := dal.FindUserByEmail(&struct{ ID string }{}, b.Email).Error
 
 	// If email already exists, return
 	if !errors.Is(err, gorm.ErrRecordNotFound) {
-		ctx.Next(fiber.NewError(fiber.StatusConflict, "Email already exists"))
-		return
+		return fiber.NewError(fiber.StatusConflict, "Email already exists")
 	}
 
 	user := &dal.User{
@@ -72,8 +67,7 @@ func Signup(ctx *fiber.Ctx) {
 
 	// Create a user, if error return
 	if err := dal.CreateUser(user); err.Error != nil {
-		ctx.Next(fiber.NewError(fiber.StatusConflict, err.Error.Error()))
-		return
+		return fiber.NewError(fiber.StatusConflict, err.Error.Error())
 	}
 
 	// generate access token
@@ -81,7 +75,7 @@ func Signup(ctx *fiber.Ctx) {
 		ID: user.ID,
 	})
 
-	ctx.JSON(&types.AuthResponse{
+	return ctx.JSON(&types.AuthResponse{
 		User: &types.UserResponse{
 			ID:    user.ID,
 			Name:  user.Name,

@@ -1,7 +1,7 @@
 package utils
 
 import (
-	"github.com/gofiber/fiber"
+	"github.com/gofiber/fiber/v2"
 )
 
 type httpError struct {
@@ -10,7 +10,7 @@ type httpError struct {
 }
 
 // ErrorHandler is used to catch error thrown inside the routes by ctx.Next(err)
-func ErrorHandler(ctx *fiber.Ctx, err error) {
+func ErrorHandler(c *fiber.Ctx, err error) error {
 	// Statuscode defaults to 500
 	code := fiber.StatusInternalServerError
 
@@ -19,7 +19,7 @@ func ErrorHandler(ctx *fiber.Ctx, err error) {
 		code = e.Code
 	}
 
-	ctx.Status(code).JSON(&httpError{
+	return c.Status(code).JSON(&httpError{
 		Statuscode: code,
 		Error:      err.Error(),
 	})

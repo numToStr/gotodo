@@ -39,3 +39,8 @@ func FindTodosByUser(dest interface{}, userIden interface{}) *gorm.DB {
 func DeleteTodo(todoIden interface{}, userIden interface{}) *gorm.DB {
 	return database.DB.Unscoped().Delete(&Todo{}, "id = ? AND user = ?", todoIden, userIden)
 }
+
+// UpdateTodo allows to update the todo with the given todoID and userID
+func UpdateTodo(todoIden interface{}, userIden interface{}, data interface{}) *gorm.DB {
+	return database.DB.Model(&Todo{}).Where("id = ? AND user = ?", todoIden, userIden).Updates(data)
+}

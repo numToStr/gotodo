@@ -3,7 +3,7 @@ package routes
 import (
 	"numtostr/gotodo/app/services"
 
-	"github.com/gofiber/fiber"
+	"github.com/gofiber/fiber/v2"
 )
 
 // AuthRoutes containes all the auth routes
